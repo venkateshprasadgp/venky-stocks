@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://127.0.0.1:8000/api';
+const API_BASE_URL = '/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 15000,
+  timeout: 60000,
 });
 
 export const searchStocks = async (query: string) => {
@@ -17,13 +17,8 @@ export const getQuote = async (ticker: string) => {
   return response.data;
 };
 
-export const getHistorical = async (ticker: string, timeframe: string = '1d', period: string = '1y') => {
+export const getHistorical = async (ticker: string, timeframe: string = '1d', period: string = 'max') => {
   const response = await api.get(`/stock/${ticker}/historical?timeframe=${timeframe}&period=${period}`);
-  return response.data;
-};
-
-export const getIndicators = async (ticker: string) => {
-  const response = await api.get(`/stock/${ticker}/indicators`);
   return response.data;
 };
 

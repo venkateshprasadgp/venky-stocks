@@ -34,7 +34,7 @@ def get_quote(ticker_symbol: str) -> Dict[str, Any]:
         "open": info.get("open"),
     }
 
-def get_historical_data(ticker_symbol: str, timeframe: str = "1d", period: str = "1y") -> List[Dict[str, Any]]:
+def get_historical_data(ticker_symbol: str, timeframe: str = "1d", period: str = "max") -> List[Dict[str, Any]]:
     # Map API timeframe to yfinance interval
     interval_map = {"1d": "1d", "1wk": "1wk", "1mo": "1mo"}
     interval = interval_map.get(timeframe, "1d")
@@ -77,9 +77,3 @@ def get_fundamentals(ticker_symbol: str) -> Dict[str, Any]:
         "52WeekHigh": info.get("fiftyTwoWeekHigh"),
         "52WeekLow": info.get("fiftyTwoWeekLow")
     }
-
-def get_historical_df(ticker_symbol: str, period: str = "1y", interval: str = "1d") -> pd.DataFrame:
-    """Returns raw dataframe for indicator calculation."""
-    ticker = yf.Ticker(ticker_symbol)
-    df = ticker.history(period=period, interval=interval)
-    return df
