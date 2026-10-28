@@ -37,9 +37,9 @@ const formatCurrency = (val: number | undefined) => {
   return '₹' + val.toLocaleString();
 };
 
-const formatRatio = (val: number | undefined, percent = false) => {
+const formatRatio = (val: number | undefined) => {
   if (val === undefined || val === null) return '-';
-  return percent ? (val * 100).toFixed(2) + '%' : val.toFixed(2);
+  return val.toFixed(2);
 };
 
 export const DataTable: React.FC<DataTableProps> = ({ fundamentals, historical, isLoading = false, onExport }) => {
@@ -114,7 +114,7 @@ export const DataTable: React.FC<DataTableProps> = ({ fundamentals, historical, 
             </div>
             <div className="flex flex-col">
               <span className="text-slate-500 text-xs mb-1">Dividend Yield</span>
-              <span className="text-white font-medium">{formatRatio(fundamentals?.dividendYield, true)}</span>
+              <span className="text-white font-medium">{formatRatio(fundamentals?.dividendYield)}%</span>
             </div>
             <div className="flex flex-col">
               <span className="text-slate-500 text-xs mb-1">52 Week High</span>

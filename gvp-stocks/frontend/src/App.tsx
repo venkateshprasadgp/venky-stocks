@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Header } from './components/Header';
 import { HeroRibbon } from './components/HeroRibbon';
 import { DataTable } from './components/DataTable';
@@ -20,8 +20,11 @@ function App() {
   const [isLoadingHistorical, setIsLoadingHistorical] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
+  const latestRequest = useRef(0);
 
   const fetchStockData = async (symbol: string) => {
+    const requestId = ++latestRequest.current;
+    const isStale = () => requestId !== latestRequest.current;
     setError(null);
     setIsLoadingQuote(true);
     setIsLoadingHistorical(true);
@@ -32,19 +35,24 @@ function App() {
         getQuote(symbol).catch(() => { throw new Error('Failed to fetch quote data. Ticker might be invalid or rate limited.'); }),
         getFundamentals(symbol).catch(() => null)
       ]);
+      if (isStale()) return;
 
       setQuote(quoteData);
       setFundamentals(fundData);
       setIsLoadingQuote(false);
 
       const histData = await getHistorical(symbol, TIMEFRAME, PERIOD).catch(() => []);
+      if (isStale()) return;
       setHistorical(histData);
     } catch (err: any) {
+      if (isStale()) return;
       console.error(err);
       setError(err.message || 'An error occurred while fetching stock data.');
     } finally {
-      setIsLoadingQuote(false);
-      setIsLoadingHistorical(false);
+      if (!isStale()) {
+        setIsLoadingQuote(false);
+        setIsLoadingHistorical(false);
+      }
     }
   };
 
