@@ -3,7 +3,7 @@ from typing import Optional
 import json
 import csv
 from io import StringIO
-from app.services import yfinance_service, calculations
+from app.services import yfinance_service
 
 router = APIRouter()
 
@@ -25,26 +25,13 @@ def get_quote(ticker: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/stock/{ticker}/historical")
-def get_historical(ticker: str, timeframe: str = "1d", period: str = "1y"):
+def get_historical(ticker: str, timeframe: str = "1d", period: str = "max"):
     try:
         symbol = yfinance_service.get_ticker_with_suffix(ticker)
         data = yfinance_service.get_historical_data(symbol, timeframe=timeframe, period=period)
         if not data:
             raise HTTPException(status_code=404, detail="Historical data not found")
         return data
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@router.get("/stock/{ticker}/indicators")
-def get_indicators(ticker: str):
-    try:
-        symbol = yfinance_service.get_ticker_with_suffix(ticker)
-        # Fetching 1y data to ensure we have enough data for 200 SMA
-        df = yfinance_service.get_historical_df(symbol, period="1y")
-        if df.empty:
-            raise HTTPException(status_code=404, detail="Data not found for indicators")
-        indicators = calculations.calculate_indicators(df)
-        return indicators
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -63,7 +50,7 @@ def get_fundamentals(ticker: str):
 def export_data(ticker: str, format: str = "csv"):
     try:
         symbol = yfinance_service.get_ticker_with_suffix(ticker)
-        data = yfinance_service.get_historical_data(symbol, timeframe="1d", period="1y")
+        data = yfinance_service.get_historical_data(symbol, timeframe="1d", period="max")
         if not data:
             raise HTTPException(status_code=404, detail="No data available to export")
 
